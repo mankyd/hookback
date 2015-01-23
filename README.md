@@ -40,6 +40,14 @@ The server section has only two options, both shown. By default, the server
 listens on all interfaces ("0.0.0.0") and port "3015". If this is acceptable,
 you are free to remove the "server" section from the config entirely.
 
+JSON Payload
+------------
+The JSON payload received from GitHub will be substituted in for "%p" when it
+occurs as an argument of the command. If you need "%p" to appear in your command
+without being replaced by the payload, use "%%p". For two percents, use "%%%p",
+etc. Hookback removes one of the percents and passes it to the underlying
+command.
+
 Waiting
 -------
 If "wait" is set to true, the Hookback waits for the command to finish running
