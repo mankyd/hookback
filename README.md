@@ -20,7 +20,7 @@ A configuration typically looks like the following:
           "events":  {
             "ping": {
               "wait": true,
-              "cmd": ["echo", "pinged"]
+              "cmd": ["echo", "pong"]
             }
           }
         }
