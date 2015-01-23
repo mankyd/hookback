@@ -78,6 +78,15 @@ func runCmd(cmd *exec.Cmd, errChan chan error) {
 	errChan <- err
 }
 
+func getEventID(headers *http.Header) (string, error) {
+	eventId := headers.Get("X-GitHub-Delivery")
+	if eventId == "" {
+		return eventId, errors.New("No event id set")
+	}
+
+	return eventId, nil
+}
+
 func getEventType(headers *http.Header) (string, error) {
 	eventType := headers.Get("X-GitHub-Event")
 	if eventType == "" {
@@ -173,6 +182,14 @@ func (hh *HookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	eventId, err := getEventID(&r.Header)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, err.Error())
+		return
+	}
+
 	eventType, err := getEventType(&r.Header)
 	if err != nil {
 		log.Println(err)
@@ -181,7 +198,6 @@ func (hh *HookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
 	eventHandler, ok := repoSettings.Events[eventType]
 	if !ok {
 		w.WriteHeader(http.StatusPreconditionFailed)
@@ -189,8 +205,9 @@ func (hh *HookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Printf("%s event received. %s. %s", eventType, eventId, eventHandler.Cmd)
+
 	errChan := make(chan error)
-	fmt.Println("running")
 	cmd := buildCmd(eventHandler.Cmd, &payloadS)
 	// If we're waiting for the command, capture its stdout/stderr.
 	var outBuff bytes.Buffer
@@ -249,5 +266,6 @@ func (hh *HookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			log.Println("Problem completing command: %s", err)
 		}
 	}
-	fmt.Println("complete")
+
+	log.Printf("%s event completed. %s", eventType, eventId)
 }
