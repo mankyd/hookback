@@ -1,5 +1,7 @@
 # Hookback
 
+[![Build Status](https://travis-ci.org/mankyd/hookback.svg?branch=master)](https://travis-ci.org/mankyd/hookback)
+
 A simple GitHub WebHook server.
 
 Provide a configuration file. Tell it what command to run for what events and on
