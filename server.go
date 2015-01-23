@@ -120,6 +120,7 @@ func validateSecret(secret string, headers *http.Header, body *[]byte) error {
 	if secret != "" {
 		hmacHex := headers.Get("X-Hub-Signature")
 
+		//TODO(mankyd): Support other hash types?
 		if !strings.HasPrefix(hmacHex, "sha1=") {
 			return fmt.Errorf("Unknown hash type: %s", hmacHex)
 		}
